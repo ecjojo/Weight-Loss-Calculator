@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>減肥計算機</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>減脂運動量計算機</h1>
+    <p class="notice">💡結果為估算參考和娛樂用途，非正式科學研究，鼓勵使用有氧運動進行減脂。</p>
+    <form>
+        <label for="age">年齡：</label>
+        <input type="text" id="age" name="age"><br><br>
+
+        <label for="height">身高(cm)：</label>
+        <input type="text" id="height" name="height"><br><br>
+
+        <label for="weight">體重(kg)：</label>
+        <input type="text" id="weight" name="weight"><br><br>
+
+        <label for="targetWeight">目標體重(kg)：</label>
+        <input type="text" id="targetWeight" name="targetWeight"><br><br>
+
+        <label for="days">目標達成天數：</label>
+        <input type="text" id="days" name="days"><br><br>
+
+        <input type="submit" value="計算">
+    </form>
+    <hr />
+
+    <div id="output"></div>
+
+
+    <div class="notice">
+        <p> ⚙️參考公式: </p>
+        <p> 一公斤需要消耗卡路里 = 7700 </p>
+        <p> 中低強度運動心率 = (220 - 年齡) x 70% </p>
+        <p> 中低強度運動卡路里消耗 = (公斤 × 5 MET值)</p>
+
+    </div>
+    <hr />
+    <div id="weekly-plan"></div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+
+            e.preventDefault();
+            let age = parseFloat(document.getElementById('age').value);
+            let height = parseFloat(document.getElementById('height').value);
+            let weight = parseFloat(document.getElementById('weight').value);
+            let targetWeight = parseFloat(document.getElementById('targetWeight').value);
+            let days = parseInt(document.getElementById('days').value);
+
+            let lossWeightCount = weight - targetWeight;
+            let caloriesPerDay = ((lossWeightCount) / days) * 7700;
+            let weightMET = targetWeight * 5;
+
+            let hours = Math.floor(caloriesPerDay / weightMET);
+            let minutes = Math.round((caloriesPerDay / weightMET - hours) * 60);
+
+            document.getElementById('output').innerText = 
+            `每天需要消耗 ${(caloriesPerDay).toFixed(0)} 卡路里 \n 
+            進行低強度運動(心率達${((220 - age) * 0.7).toFixed(0)}) 1小時可消耗約  ${weight * 5} - ${weightMET} 卡路里 \n 
+            只要每天運動 ${hours} 小時 ${minutes} 分鐘就可以達到目標`;
+
+            let weeklyCount = (days/7);           
+            let caloriesPerWeek = caloriesPerDay * 7;
+            let weeklyLossWeight = lossWeightCount/weeklyCount;
+
+            document.getElementById('weekly-plan').innerText = `每週需要消耗 ${(caloriesPerWeek).toFixed(0)} 卡路里 \n`;
+            
+            for (let week = 1; week < weeklyCount; week++) {
+                
+                let weeklyWeight = weight - (weeklyLossWeight * week);
+
+                let weeklyweightMET = weeklyWeight * 5;
+
+                let weeklyhours = Math.floor(caloriesPerDay / weeklyweightMET);
+                let weeklyminutes = Math.round((caloriesPerDay / weeklyweightMET - weeklyhours) * 60);
+
+                document.getElementById('weekly-plan').innerText += 
+                `第${week}週目標 ${(weeklyWeight).toFixed(1)}kg 每天運動 ${weeklyhours}小時${weeklyminutes}分鐘\n`;
+
+            }
+            if (days%7!=0){
+                let remainingDays = days%7;
+                document.getElementById('weekly-plan').innerText += 
+                `第${(weeklyCount+1).toFixed(0)}週目標 剩餘${remainingDays}天 ${targetWeight}kg  每天運動 ${hours}小時${minutes}分鐘\n`;
+
+            }
+
+
+
+                // Local storage
+            localStorage.setItem('age', age);
+            localStorage.setItem('height', height);
+            localStorage.setItem('weight', weight);
+            localStorage.setItem('targetWeight', targetWeight);
+            localStorage.setItem('days', days);
+        });
+
+        // Retrieve data from local storage on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('age').value = localStorage.getItem('age') || '';
+            document.getElementById('height').value = localStorage.getItem('height') || '';
+            document.getElementById('weight').value = localStorage.getItem('weight') || '';
+            document.getElementById('targetWeight').value = localStorage.getItem('targetWeight') || '';
+            document.getElementById('days').value = localStorage.getItem('days') || '';
+        });
+
+
+    </script>
+</body>
+
+</html>
